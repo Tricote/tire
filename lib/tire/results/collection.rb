@@ -93,8 +93,11 @@ module Tire
             document = {}
 
             # Update the document with content and ID
-            document = h['_source'] ? document.update( h['_source'] || {} ) : document.update( __parse_fields__(h['fields']) )
+            # To handle both _source and fields (search with script_fields...)
+            document.update( h['_source'] || {} ) if document = h['_source']
+            document.update( __parse_fields__(h['fields']) )
             document.update( {'id' => h['_id']} )
+
 
             # Update the document with meta information
             ['_score', '_type', '_index', '_version', 'sort', 'highlight', '_explanation'].each { |key| document.update( {key => h[key]} || {} ) }
